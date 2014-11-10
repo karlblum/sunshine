@@ -10,10 +10,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 
 public class DetailActivity extends Activity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +26,6 @@ public class DetailActivity extends Activity {
                     .add(R.id.container, new DetailsFragment())
                     .commit();
         }
-
     }
 
 
@@ -32,6 +33,18 @@ public class DetailActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
+
+        ShareActionProvider mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.action_share).getActionProvider();
+
+        Intent intent = this.getIntent();
+        String message = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,message + " #SunriseApp");
+
+        mShareActionProvider.setShareIntent(shareIntent);
+
         return true;
     }
 
@@ -67,13 +80,12 @@ public class DetailActivity extends Activity {
 
 
             Intent intent = getActivity().getIntent();
-            String message = message = intent.getStringExtra(Intent.EXTRA_TEXT);
+            String message = intent.getStringExtra(Intent.EXTRA_TEXT);
             Log.v("MESSAGE RECEIVED",message);
 
             TextView textView = (TextView)rootView.findViewById(R.id.details_text);
             Log.v("View",textView.toString());
             textView.setText(message);
-
             return rootView;
         }
     }
