@@ -1,13 +1,14 @@
-package com.example.android.sunshine;
+package com.example.android.sunshine.app;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,8 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +36,7 @@ import java.util.Date;
 
 public class ForecastFragment extends Fragment {
 
-    private ArrayAdapter<String> mForecastAdapter;
+    private RecyclerView.Adapter mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -80,28 +80,22 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> weatherData = new ArrayList<String>();
+        //mForecastAdapter = new ArrayAdapter<String>(
+        //        getActivity(),
+        //        R.layout.list_item_forecast,
+        //        R.id.list_item_forecast_textview,
+        //        weatherData);
 
-        mForecastAdapter = new ArrayAdapter<String>(
-                getActivity(),
-                R.layout.list_item_forecast,
-                R.id.list_item_forecast_textview,
-                weatherData);
+        mForecastAdapter = new ListAdapter(new String[0]);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
+        RecyclerView  recyclerView  = (RecyclerView) rootView.findViewById(R.id.recycler_view_forecast);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CharSequence forecast = mForecastAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(),DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, forecast);
-                startActivity(intent);
-            }
-        });
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
 
-         return rootView;
+        recyclerView.setAdapter(mForecastAdapter);
+
+        return rootView;
     }
 
     public class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
@@ -111,8 +105,7 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                mForecastAdapter.clear();
-                mForecastAdapter.addAll(result);
+                mForecastAdapter = new ListAdapter(result);
             }
         }
 
@@ -188,7 +181,6 @@ public class ForecastFragment extends Fragment {
                 }
             }
 
-            String[] result = new String[0];
             try {
                 return getWeatherDataFromJson(forecastJsonStr,7);
             } catch (JSONException e) {
