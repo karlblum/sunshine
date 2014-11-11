@@ -1,7 +1,6 @@
 package com.example.android.sunshine.app;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,8 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,13 +27,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 
 public class ForecastFragment extends Fragment {
 
-    private RecyclerView.Adapter mForecastAdapter;
+    private ListAdapter mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -105,7 +101,8 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                mForecastAdapter = new ListAdapter(result);
+                mForecastAdapter.setDataset(result);
+                mForecastAdapter.notifyDataSetChanged();
             }
         }
 
